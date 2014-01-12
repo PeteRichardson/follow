@@ -3,6 +3,10 @@ import time
 
 from noise import pnoise1
 import random
+import curses
+import signal
+import sys
+
 
 class World(object):
     ''' the world as we know it '''
@@ -10,6 +14,9 @@ class World(object):
         self.width = width
         self.height = height
         self.animals = animals
+        self.quit = False
+        self.scrn = curses.initscr()
+        curses.curs_set(0)
         for animal in animals:
             animal.x = int(random.random() * self.width) 
             animal.y = int(random.random() * self.height)
@@ -18,18 +25,10 @@ class World(object):
 
     def render(self):
         ''' dump out the state of things '''
-        print self
-
-    def __str__(self):
-        first, last = animals[0], animals[1]
-        if animals[1].x < animals[0].x:
-            first, last = last, first
-        if first.x == last.x:
-            anstring = "*"
-        else:
-            anstring = "{0}{1}{2}".format(first.symbol,'.'*(last.x -first.x -1),last.symbol)
-        return "{0}{1}".format(' '*(first.x-1),anstring)
-       
+        self.scrn.clear()
+        for animal in animals:
+            self.scrn.addch(animal.y, animal.x, animal.symbol)
+        self.scrn.refresh()
 
     def update(self):
         ''' let every animal move '''
@@ -42,6 +41,14 @@ class World(object):
             self.update()
             self.render()
             time.sleep(0.1)
+
+
+def cleanup(signum, frame):
+    curses.echo()
+    curses.endwin()
+    sys.exit(0)
+signal.signal(signal.SIGINT, cleanup)
+
 
 
 class Mover(object):
@@ -76,7 +83,7 @@ class RandomMover(Mover):
 
 class Follower(Mover):
     ''' a thing that follows something else '''
-    def __init__(self, name, target, kp=0.2, symbol='F'):
+    def __init__(self, name, target, kp=0.4, symbol='F'):
         super(Follower, self).__init__(name=name, symbol=symbol)
         self.kp = kp
         self.target = target
