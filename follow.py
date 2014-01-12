@@ -65,7 +65,7 @@ class Mover(object):
 
 class RandomMover(Mover):
     """a thing that wanders around """
-    def __init__(self, name="Target", delta=0.07, symbol='R'):
+    def __init__(self, name="Target", delta=0.06, symbol='R'):
         super(RandomMover, self).__init__(name, symbol=symbol)
         self.currentx = random.random() * 10000
         self.currenty = random.random() * 100000
@@ -83,20 +83,28 @@ class RandomMover(Mover):
 
 class Follower(Mover):
     ''' a thing that follows something else '''
-    def __init__(self, name, target, kp=0.4, symbol='F'):
+    def __init__(self, name, target, kp=0.4, ki=0.03, symbol='F'):
         super(Follower, self).__init__(name=name, symbol=symbol)
         self.kp = kp
+        self.ki = ki
         self.target = target
+        self.sum_xerr = 0
+        self.sum_yerr = 0
 
     def move(self):
         ''' update self.   Move proportionally toward target '''
-        self.x += int(self.kp * (self.target.x - self.x))
-        self.y += int(self.kp * (self.target.y - self.y))
+        xerr = self.target.x - self.x
+        yerr = self.target.y - self.y
+        self.x += int(self.kp * xerr + self.ki * self.sum_xerr)
+        self.y += int(self.kp * yerr + self.ki * self.sum_yerr)
+        self.sum_xerr += xerr
+        self.sum_yerr += yerr
+
 
 
 if __name__ == "__main__":
-    prey = RandomMover(name="Prey", symbol = 'o')
-    hunter = Follower(name="Hunter", target=prey, symbol='<')
+    prey = RandomMover(name="Prey", symbol = '*')
+    hunter = Follower(name="Hunter", target=prey, symbol='@')
     animals = [hunter, prey]
     World(animals).run()
     
