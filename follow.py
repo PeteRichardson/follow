@@ -5,6 +5,7 @@ from noise import pnoise1
 import random
 
 class World(object):
+    ''' the world as we know it '''
     def __init__(self, animals, width=40, height=20):
         self.width = width
         self.height = height
@@ -60,7 +61,7 @@ class RandomMover(Mover):
         n = pnoise1(self.currentx * self.delta, 1) 
         m = pnoise1(self.currenty * self.delta, 1) 
         self.x = int(n/2 * self.maxx + self.maxx/2)
-        self.y = int(n/2 * self.maxy + self.maxy/2)
+        self.y = int(m/2 * self.maxy + self.maxy/2)
 
 
 class Follower(Mover):
@@ -78,8 +79,9 @@ class Follower(Mover):
 
 if __name__ == "__main__":
     prey = RandomMover(name="Prey", symbol = 'P')
+    p2 = RandomMover(name="prey2", symbol = '.')
     hunter = Follower(name="Hunter", target=prey, symbol='H')
-    animals = [hunter, prey]
+    animals = [hunter, prey, p2]
     World(animals).run()
     
 
