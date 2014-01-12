@@ -6,6 +6,7 @@ import random
 import curses
 import signal
 import sys
+import logging
 
 
 class World(object):
@@ -35,19 +36,22 @@ class World(object):
         for animal in self.animals:
             animal.move()
 
-    def run(self):
+    def run(self, interval = 0.1):
         ''' execute the world '''
         while True:
             self.update()
             self.render()
-            time.sleep(0.1)
+            time.sleep(interval)
 
 
-def cleanup(signum, frame):
+def cleanup():
     curses.echo()
     curses.endwin()
     sys.exit(0)
-signal.signal(signal.SIGINT, cleanup)
+def cleanup_handler(signum, frame):
+    cleanup()
+
+signal.signal(signal.SIGINT, cleanup_handler)
 
 
 
@@ -101,11 +105,45 @@ class Follower(Mover):
         self.sum_yerr += yerr
 
 
+class Escaper(Mover):
+    ''' a thing that runs from something else '''
+    def __init__(self, name, target=None, symbol='F'):
+        super(Escaper, self).__init__(name=name, symbol=symbol)
+        self.target = target
+
+    def move(self):
+        ''' update self.   Move away from  target '''
+        logging.debug('moving prey. x={0},y={1}'.format(self.x, self.y))
+        buffer = 3
+        xdistance = self.x - self.target.x
+        if xdistance == 0:
+            xdistance = 1
+        if abs(xdistance) < buffer:
+            self.x += buffer - xdistance
+        if self.x < 0 or self.x >= self.maxx:
+            self.x -= 2 * (buffer - xdistance)
+
+        ydistance = self.y - self.target.y
+        if ydistance == 0:
+            ydistance = 1
+        if abs(ydistance) < buffer:
+            self.y -= buffer - ydistance
+        if self.y < 0 or self.y >= self.maxy:
+            self.y += 2 * (buffer - ydistance)
+        logging.debug('moved  prey. x={0},y={1}'.format(self.x, self.y))
+
 
 if __name__ == "__main__":
-    prey = RandomMover(name="Prey", symbol = '*')
-    hunter = Follower(name="Hunter", target=prey, symbol='@')
-    animals = [hunter, prey]
-    World(animals).run()
+    logging.basicConfig(level=logging.DEBUG, filename = 'follow.txt')
+    try:
+        prey = Escaper(name="Prey", symbol = '*')
+        hunter = Follower(name="Hunter", target=prey, symbol='@')
+        prey.target = hunter
+        animals = [hunter, prey]
+        World(animals).run(interval = 0.2)
+    except Exception as err:
+        print  err
+    finally:
+        cleanup()
     
 
