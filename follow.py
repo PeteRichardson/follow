@@ -18,8 +18,18 @@ class World(object):
 
     def render(self):
         ''' dump out the state of things '''
-        for animal in self.animals:
-            print animal
+        print self
+
+    def __str__(self):
+        first, last = animals[0], animals[1]
+        if animals[1].x < animals[0].x:
+            first, last = last, first
+        if first.x == last.x:
+            anstring = "*"
+        else:
+            anstring = "{0}{1}{2}".format(first.symbol,'.'*(last.x -first.x -1),last.symbol)
+        return "{0}{1}".format(' '*(first.x-1),anstring)
+       
 
     def update(self):
         ''' let every animal move '''
@@ -66,7 +76,7 @@ class RandomMover(Mover):
 
 class Follower(Mover):
     ''' a thing that follows something else '''
-    def __init__(self, name, target, kp=0.5, symbol='F'):
+    def __init__(self, name, target, kp=0.2, symbol='F'):
         super(Follower, self).__init__(name=name, symbol=symbol)
         self.kp = kp
         self.target = target
@@ -78,10 +88,9 @@ class Follower(Mover):
 
 
 if __name__ == "__main__":
-    prey = RandomMover(name="Prey", symbol = 'P')
-    p2 = RandomMover(name="prey2", symbol = '.')
-    hunter = Follower(name="Hunter", target=prey, symbol='H')
-    animals = [hunter, prey, p2]
+    prey = RandomMover(name="Prey", symbol = 'o')
+    hunter = Follower(name="Hunter", target=prey, symbol='<')
+    animals = [hunter, prey]
     World(animals).run()
     
 
