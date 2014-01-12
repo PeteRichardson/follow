@@ -105,7 +105,7 @@ class Follower(Mover):
         self.sum_yerr += yerr
 
 
-class Escaper(Mover):
+class Escaper(RandomMover):
     ''' a thing that runs from something else '''
     def __init__(self, name, target=None, symbol='F'):
         super(Escaper, self).__init__(name=name, symbol=symbol)
@@ -114,22 +114,31 @@ class Escaper(Mover):
     def move(self):
         ''' update self.   Move away from  target '''
         logging.debug('moving prey. x={0},y={1}'.format(self.x, self.y))
+        super(Escaper, self).move()
         buffer = 3
         xdistance = self.x - self.target.x
-        if xdistance == 0:
-            xdistance = 1
+        targetonleft = xdistance > 0
         if abs(xdistance) < buffer:
-            self.x += buffer - xdistance
-        if self.x < 0 or self.x >= self.maxx:
-            self.x -= 2 * (buffer - xdistance)
+            if targetonleft:
+                self.x += 1
+            else:
+                self.x -= 1
+        if self.x < 0:
+            self.x = 1
+        if self.x >= self.maxx:
+            self.x = self.maxx - 1
 
         ydistance = self.y - self.target.y
-        if ydistance == 0:
-            ydistance = 1
+        targetontop = ydistance > 0
         if abs(ydistance) < buffer:
-            self.y -= buffer - ydistance
-        if self.y < 0 or self.y >= self.maxy:
-            self.y += 2 * (buffer - ydistance)
+            if targetontop:
+                self.y += 1
+            else:
+                self.y -= 1
+        if self.y < 0:
+            self.y = 1
+        if self.y >= self.maxy:
+            self.y = self.maxy - 1
         logging.debug('moved  prey. x={0},y={1}'.format(self.x, self.y))
 
 
@@ -140,10 +149,14 @@ if __name__ == "__main__":
         hunter = Follower(name="Hunter", target=prey, symbol='@')
         prey.target = hunter
         animals = [hunter, prey]
-        World(animals).run(interval = 0.2)
+        World(animals).run(interval = 0.1)
     except Exception as err:
+        logging.debug(err)
+        cleanup()
         print  err
     finally:
+        print "finally"
         cleanup()
+        print "done"
     
 
