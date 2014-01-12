@@ -9,6 +9,11 @@ class World(object):
         self.width = width
         self.height = height
         self.animals = animals
+        for animal in animals:
+            animal.x = int(random.random() * self.width) 
+            animal.y = int(random.random() * self.height)
+            animal.maxx = self.width
+            animal.maxy = self.height
 
     def render(self):
         ''' dump out the state of things '''
@@ -25,22 +30,25 @@ class World(object):
         while True:
             self.update()
             self.render()
-            time.sleep(0.2)
+            time.sleep(0.1)
 
 
 class Mover(object):
     ''' a thing that can move in the World'''
-    def __init__(self, name, world, startx, starty):
+    def __init__(self, name, symbol='o'):
         self.name = name
-        self.x = startx
-        self.y = starty
-        self.maxx = world.width
-        self.maxy = world.height
+        self.symbol = symbol
+        self.x = 0
+        self.y = 0
+
+    def __str__(self):
+        return " "*self.y+self.symbol
+
 
 class RandomMover(Mover):
-    """a thing to follow"""
-    def __init__(self, name="Target", startx=5, starty=5, delta=0.07, max=40):
-        super(Prey, self).__init__(name, startx, starty)
+    """a thing that wanders around """
+    def __init__(self, name="Target", delta=0.07, symbol='R'):
+        super(RandomMover, self).__init__(name, symbol=symbol)
         self.currentx = random.random() * 10000
         self.currenty = random.random() * 100000
         self.delta = delta
@@ -54,27 +62,24 @@ class RandomMover(Mover):
         self.x = int(n/2 * self.maxx + self.maxx/2)
         self.y = int(n/2 * self.maxy + self.maxy/2)
 
-    def __str__(self):
-        return " "*self.x+'o'
 
 class Follower(Mover):
-    def __init__(self, startx=5, starty=5, kp=0.5, target):
-        super(Hunter, self).__init__(startx=startx, starty=starty)
+    ''' a thing that follows something else '''
+    def __init__(self, name, target, kp=0.5, symbol='F'):
+        super(Follower, self).__init__(name=name, symbol=symbol)
         self.kp = kp
         self.target = target
 
-    def move(self, targetx):
+    def move(self):
         ''' update self.   Move proportionally toward target '''
         self.x += int(self.kp * (self.target.x - self.x))
-
-    def __str__(self):
-        return " "*self.x+'x'
+        self.y += int(self.kp * (self.target.y - self.y))
 
 
 if __name__ == "__main__":
-    prey = RandomMover()
-    hunter = Follower(prey)
-    animals = [prey, hunter]
+    prey = RandomMover(name="Prey", symbol = 'P')
+    hunter = Follower(name="Hunter", target=prey, symbol='H')
+    animals = [hunter, prey]
     World(animals).run()
     
 
