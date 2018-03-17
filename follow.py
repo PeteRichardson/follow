@@ -7,6 +7,7 @@ import curses
 import signal
 import sys
 import logging
+import traceback
 
 
 class World(object):
@@ -19,10 +20,14 @@ class World(object):
         self.scrn = curses.initscr()
         curses.curs_set(0)
         for animal in animals:
-            animal.x = int(random.random() * self.width) 
-            animal.y = int(random.random() * self.height)
+            if animal.x is None:
+                animal.x = int(random.random() * self.width)
+            if animal.y is None:
+                animal.y = int(random.random() * self.height)
             animal.maxx = self.width
             animal.maxy = self.height
+        for animal in self.animals:
+            animal.setup()
 
     def render(self):
         ''' dump out the state of things '''
@@ -62,9 +67,78 @@ class Mover(object):
         self.symbol = symbol
         self.x = 0
         self.y = 0
+        self.maxx = 0
+        self.maxy = 0
 
     def __str__(self):
         return " "*self.y+self.symbol
+
+    def setup(self):
+        """ called after the world is initialized"""
+        pass
+
+class SpiralMover(Mover):
+    """Goes in a spiral!"""
+    def __init__(self, name="spiral", x=0, y=0, symbol='@'):
+        super(SpiralMover, self).__init__(name, symbol=symbol)
+        self.currentx = x
+        self.currenty = y
+        self.totalmoves = 0
+
+    def setup(self):
+        logging.debug('setting up grid: maxx={:3},y={:3}'.format(self.maxx, self.maxy))
+        self.grid = Matrix = [[0 for x in range(self.maxx)] for y in range(self.maxy)]
+
+
+    def can_move_right(self):
+        if self.x == self.maxx-1:
+            return False
+        if self.grid[self.x+1][self.y] != 0:
+            return False
+        return True
+
+    def can_move_down(self):
+        if self.y == self.maxy-1:
+            return False
+        if self.grid[self.x][self.y+1] != 0:
+            return False
+        return True
+
+    def can_move_left(self):
+        if self.x == 0:
+            return False
+        if self.grid[self.x-1][self.y] != 0:
+            return False
+        return True
+
+    def can_move_up(self):
+        if self.y == 0:
+            return False
+        if self.grid[self.x][self.y-1] != 0:
+            return False
+        return True
+
+    def move(self):
+        """ move in a spiral """
+        self.totalmoves = self.totalmoves + 1
+        self.grid[self.x][self.y] = self.totalmoves
+        self.symbol=str(self.totalmoves)[-1]
+        move = None
+        if self.can_move_right():
+            move = "right"
+            self.x = self.x + 1
+        elif self.can_move_down():
+            move = "down"
+            self.y = self.y + 1
+        elif self.can_move_left():
+            move = "left"
+            self.x = self.x - 1
+        elif self.can_move_up():
+            move ="up"
+            self.y = self.y - 1
+        else:
+            raise Exception("Done!")
+        logging.debug('moved {:8}  x={:3},y={:3}'.format(move, self.x, self.y))
 
 
 class RandomMover(Mover):
@@ -145,18 +219,18 @@ class Escaper(RandomMover):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, filename = 'follow.txt')
     try:
-        prey = Escaper(name="Prey", symbol = '*')
-        hunter = Follower(name="Hunter", target=prey, symbol='@')
-        prey.target = hunter
-        animals = [hunter, prey]
-        World(animals).run(interval = 0.1)
+        spiral = SpiralMover()
+        animals = [spiral]
+        World(animals, width=6, height=6).run(interval = 0.4)
     except Exception as err:
+        print (err)
         logging.debug(err)
+        logging.debug(traceback.format_exc(err))
         cleanup()
-        print  err
+
     finally:
-        print "finally"
+        print ("finally")
         cleanup()
-        print "done"
+        print ("done")
     
 
