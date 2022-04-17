@@ -10,12 +10,11 @@ import sys
 
 class World(object):
     ''' the world as we know it '''
-    def __init__(self, animals, width=80, height=40):
-        self.width = width
-        self.height = height
+    def __init__(self, animals):
         self.animals = animals
         self.quit = False
         self.scrn = curses.initscr()
+        self.height, self.width = self.scrn.getmaxyx()
         curses.curs_set(0)
         for animal in animals:
             animal.x = int(random.random() * self.width) 
