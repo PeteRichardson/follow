@@ -6,12 +6,11 @@ import random
 import curses
 import signal
 import sys
-import logging
 
 
 class World(object):
     ''' the world as we know it '''
-    def __init__(self, animals, width=40, height=20):
+    def __init__(self, animals, width=80, height=40):
         self.width = width
         self.height = height
         self.animals = animals
@@ -113,7 +112,6 @@ class Escaper(RandomMover):
 
     def move(self):
         ''' update self.   Move away from  target '''
-        logging.debug('moving prey. x={0},y={1}'.format(self.x, self.y))
         super(Escaper, self).move()
         buffer = 3
         xdistance = self.x - self.target.x
@@ -139,11 +137,9 @@ class Escaper(RandomMover):
             self.y = 1
         if self.y >= self.maxy:
             self.y = self.maxy - 1
-        logging.debug('moved  prey. x={0},y={1}'.format(self.x, self.y))
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, filename = 'follow.txt')
     try:
         prey = Escaper(name="Prey", symbol = '*')
         hunter = Follower(name="Hunter", target=prey, symbol='@')
@@ -151,12 +147,9 @@ if __name__ == "__main__":
         animals = [hunter, prey]
         World(animals).run(interval = 0.1)
     except Exception as err:
-        logging.debug(err)
         cleanup()
-        print  err
+        print (err)
     finally:
-        print "finally"
         cleanup()
-        print "done"
     
 
