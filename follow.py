@@ -148,8 +148,8 @@ class Follower(RandomMover):
         yerr = self.target.y - self.y
         self.x += int(self.kp * xerr + self.ki * self.sum_xerr)
         self.y += int(self.kp * yerr + self.ki * self.sum_yerr)
-        self.sum_xerr += xerr
-        self.sum_yerr += yerr
+        self.sum_xerr = max(-self.maxx, min(self.maxx, self.sum_xerr + xerr))
+        self.sum_yerr = max(-self.maxy, min(self.maxy, self.sum_yerr + yerr))
         self.limit()
 
 
