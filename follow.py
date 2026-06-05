@@ -32,7 +32,7 @@ class World(object):
         self.scrn = curses.initscr()
         self.height, self.width = self.scrn.getmaxyx()
         curses.curs_set(0)
-        for animal in animals:
+        for animal in self.animals:
             animal.x = int(random.random() * self.width)
             animal.y = int(random.random() * self.height)
             animal.maxx = self.width - 1
@@ -43,7 +43,7 @@ class World(object):
         self.scrn.clear()
         self.scrn.addstr(self.height - 1, 0, "ctrl-c to exit")
         n = 0
-        for animal in animals:
+        for animal in self.animals:
             self.scrn.addch(animal.y, animal.x, animal.symbol)
             self.scrn.addstr(n, 0, str(animal))  # add animal to the legend
             n = n + 1
@@ -184,8 +184,8 @@ class Escaper2(RandomMover):
     def move(self):
         """_If too close_, move away from target"""
         buffer = 10.0
+        super(Escaper2, self).move()
         if self.distance_to_target <= buffer:
-            super(Escaper2, self).move()
             self.x += 1 if self.x > self.target.x else -1
             self.y += 1 if self.y > self.target.y else -1
         self.limit()
