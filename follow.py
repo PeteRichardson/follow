@@ -108,7 +108,7 @@ class Mover(object):
 
     def __str__(self):
         """string representation is used to populate the legend"""
-        return self.symbol + ": " + str(self.x) + "," + str(self.y)
+        return f"{self.symbol}: {self.x},{self.y}"
 
 
 class RandomMover(Mover):
