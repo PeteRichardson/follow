@@ -44,7 +44,7 @@ class World(object):
         self.scrn.addstr(self.height - 1, 0, "ctrl-c to exit")
         n = 0
         for animal in self.animals:
-            self.scrn.addch(animal.y, animal.x, animal.symbol)
+            self.scrn.addstr(animal.y, animal.x, animal.symbol)
             self.scrn.addstr(n, 0, str(animal))  # add animal to the legend
             n = n + 1
         self.scrn.refresh()
