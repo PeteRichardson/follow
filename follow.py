@@ -79,7 +79,7 @@ signal.signal(signal.SIGINT, cleanup_handler)
 
 def dist(obj1, obj2):
     """Note to self:  square in python is _not_ x^2!  It's x**2!"""
-    return math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2)
+    return math.hypot(obj1.x - obj2.x, obj1.y - obj2.y)
 
 
 class Mover(object):
