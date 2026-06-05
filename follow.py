@@ -192,7 +192,7 @@ class Escaper2(RandomMover):
 
     def __str__(self):
         """string representation is used to populate the legend"""
-        dist = str(self.distance_to_target)[0:5]
+        dist = f"{self.distance_to_target:.2f}"
         return f"{self.symbol}: {str(self.x)}, {str(self.y)}  distance: {dist}"
 
 
