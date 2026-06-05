@@ -20,7 +20,7 @@ import sys
 import math
 
 
-class World(object):
+class World:
     """the world as we know it
 
     Contains a list of animals that move, and functions to draw
@@ -53,7 +53,7 @@ class World(object):
         """let every animal move"""
         for animal in self.animals:
             animal.move()
-            # animal.evaluate()
+
 
     def run(self, interval=0.1):
         """execute the world"""
@@ -82,7 +82,7 @@ def dist(obj1, obj2):
     return math.hypot(obj1.x - obj2.x, obj1.y - obj2.y)
 
 
-class Mover(object):
+class Mover:
     """a thing that can move in the World"""
 
     def __init__(self, name, symbol="M"):
@@ -170,8 +170,6 @@ class Escaper(RandomMover):
 
 class Escaper2(RandomMover):
     """a thing that runs from something else, if it's too close"""
-
-    last_move_was_random = False
 
     @property
     def distance_to_target(self):
