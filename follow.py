@@ -115,7 +115,7 @@ class RandomMover(Mover):
     """a thing that wanders around"""
 
     def __init__(self, name="Target", delta=0.06, symbol="R"):
-        super(RandomMover, self).__init__(name, symbol=symbol)
+        super().__init__(name, symbol=symbol)
         self.currentx = random.random() * 10000
         # y multiplier bigger because generally maxx >> maxy
         self.currenty = random.random() * 100000
@@ -135,7 +135,7 @@ class Follower(RandomMover):
     """a thing that follows something else"""
 
     def __init__(self, name, target, kp=0.4, ki=0.03, symbol="F"):
-        super(Follower, self).__init__(name=name, symbol=symbol)
+        super().__init__(name=name, symbol=symbol)
         self.kp = kp
         self.ki = ki
         self.target = target
@@ -157,12 +157,12 @@ class Escaper(RandomMover):
     """a thing that runs from something else"""
 
     def __init__(self, name, target=None, symbol="E"):
-        super(Escaper, self).__init__(name=name, symbol=symbol)
+        super().__init__(name=name, symbol=symbol)
         self.target = target
 
     def move(self):
         """Move away from target"""
-        super(Escaper, self).move()
+        super().move()
         self.x += 1 if self.x > self.target.x else -1
         self.y += 1 if self.y > self.target.y else -1
         self.limit()
@@ -178,13 +178,13 @@ class Escaper2(RandomMover):
         return dist(self, self.target)
 
     def __init__(self, name, target=None, symbol="E"):
-        super(Escaper2, self).__init__(name=name, symbol=symbol)
+        super().__init__(name=name, symbol=symbol)
         self.target = target
 
     def move(self):
         """_If too close_, move away from target"""
         buffer = 10.0
-        super(Escaper2, self).move()
+        super().move()
         if self.distance_to_target <= buffer:
             self.x += 1 if self.x > self.target.x else -1
             self.y += 1 if self.y > self.target.y else -1
