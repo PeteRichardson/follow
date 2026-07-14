@@ -13,8 +13,6 @@ from noise import pnoise1
 import simpy.rt
 import random
 import curses
-import signal
-import sys
 import math
 
 
@@ -24,10 +22,10 @@ class World:
     Contains a list of animals that move, and functions to draw
     """
 
-    def __init__(self, animals):
+    def __init__(self, animals, scrn):
         self.animals = animals
         self.quit = False
-        self.scrn = curses.initscr()
+        self.scrn = scrn
         self.height, self.width = self.scrn.getmaxyx()
         curses.curs_set(0)
         for animal in self.animals:
@@ -62,20 +60,6 @@ class World:
         self.draw_interval = draw_interval
         env.process(self.draw_loop(env))
         env.run()
-
-
-def cleanup():
-    """Teardown curses.  Otherwise terminal maybe left in a bad state"""
-    curses.echo()
-    curses.endwin()
-    sys.exit(0)
-
-
-def cleanup_handler(signum, frame):
-    cleanup()
-
-
-signal.signal(signal.SIGINT, cleanup_handler)
 
 
 def dist(obj1, obj2):
@@ -202,13 +186,14 @@ class Escaper2(RandomMover):
 
 
 if __name__ == "__main__":
-    try:
-        prey = Escaper2(name="Prey", symbol="🐇")
-        hunter = Follower(name="Hunter", target=prey, symbol="🐕", kp=0.25, ki=0.03)
-        randy = RandomMover(name="Randy", symbol="🦋")
-        prey.target = hunter
+    prey = Escaper2(name="Prey", symbol="🐇")
+    hunter = Follower(name="Hunter", target=prey, symbol="🐕", kp=0.25, ki=0.03)
+    randy = RandomMover(name="Randy", symbol="🦋")
+    prey.target = hunter
 
-        animals = [prey, hunter, randy]
-        World(animals).run(interval=0.1)
-    finally:
-        cleanup()
+    animals = [prey, hunter, randy]
+
+    def main(scrn):
+        World(animals, scrn).run(interval=0.1)
+
+    curses.wrapper(main)
