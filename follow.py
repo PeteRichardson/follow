@@ -10,9 +10,8 @@
           to exist in the same location.
 """
 
-import time
-
 from noise import pnoise1
+import simpy.rt
 import random
 import curses
 import signal
@@ -49,18 +48,21 @@ class World:
             n = n + 1
         self.scrn.refresh()
 
-    def update(self):
-        """let every animal move"""
-        for animal in self.animals:
-            animal.move()
-
-
-    def run(self, interval=0.1):
-        """execute the world"""
+    def draw_loop(self, env):
+        """SimPy process: draw, then wait, forever."""
         while True:
-            self.update()
             self.draw()
-            time.sleep(interval)
+            yield env.timeout(self.draw_interval)
+
+    def run(self, interval=0.1, draw_interval=0.1):
+        """execute the world"""
+        env = simpy.rt.RealtimeEnvironment(factor=1.0)
+        for animal in self.animals:
+            animal.interval = interval
+            env.process(animal.run(env))
+        self.draw_interval = draw_interval
+        env.process(self.draw_loop(env))
+        env.run()
 
 
 def cleanup():
@@ -94,6 +96,12 @@ class Mover:
     def move(self):
         """a bit odd that the base Mover doesn't move, I suppose."""
         pass
+
+    def run(self, env):
+        """SimPy process: move, then wait, forever."""
+        while True:
+            self.move()
+            yield env.timeout(self.interval)
 
     def limit(self):
         """Constrain location to be within the window"""
