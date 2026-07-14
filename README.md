@@ -11,6 +11,5 @@ Follower uses a PI feedback loop
 
     
 To Do:
-* Convert this to SimPy?
 * Read keyboard for speedup, pause, etc
 * Add fixed entities (e.g. walls, plants) and don't allow two things to exist in the same location.

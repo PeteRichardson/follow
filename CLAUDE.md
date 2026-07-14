@@ -19,7 +19,7 @@ Press `ctrl-c` to exit. The simulation auto-sizes to the current terminal window
 
 Everything lives in `follow.py`. The class hierarchy:
 
-- `World` — owns the curses screen and the main loop (`run` → `update` → `draw`). Assigns random initial positions and sets `maxx`/`maxy` bounds on each animal at startup.
+- `World` — owns the curses screen. `World.run()` builds a `simpy.rt.RealtimeEnvironment`, spawns one process per animal (`Mover.run`, defined once on the base class) plus a `draw_loop` process for `World` itself, then calls `env.run()`. Each animal drives its own movement on a timer instead of being stepped by a central loop. Assigns random initial positions and sets `maxx`/`maxy` bounds on each animal at startup.
 - `Mover` — base: holds `x`, `y`, `symbol`; `limit()` clamps position to window bounds.
 - `RandomMover(Mover)` — moves via `pnoise1` (Perlin noise) to produce smooth wandering. Maintains independent `currentx`/`currenty` noise offsets.
 - `Follower(RandomMover)` — PI controller (`kp`, `ki`) that steers toward `self.target` each tick.

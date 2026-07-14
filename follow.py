@@ -4,7 +4,6 @@
     Movement is randomized using Perlin noise algorithm.
     Different animal types have different movements: Follower, Escaper, etc
 
-    TODO: Convert this to SimPy?
     TODO: Read keyboard for speedup, pause, etc
     TODO: Add fixed entities (e.g. walls, plants) and don't allow two things
           to exist in the same location.
