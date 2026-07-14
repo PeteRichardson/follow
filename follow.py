@@ -90,8 +90,8 @@ class Mover:
         """Constrain location to be within the window"""
         if self.x <= 0:
             self.x = 0
-        if self.x >= self.maxx:
-            self.x = self.maxx - 1
+        if self.x >= self.maxx - 1:
+            self.x = self.maxx - 2  # leave room for a double-width glyph
         if self.y <= 0:
             self.y = 0
         if self.y >= self.maxy:
@@ -120,6 +120,7 @@ class RandomMover(Mover):
         m = pnoise1(self.currenty * self.delta, 1)
         self.x = abs(int(n / 2 * self.maxx + self.maxx / 2))
         self.y = abs(int(m / 2 * self.maxy + self.maxy / 2))
+        self.limit()
 
 
 class Follower(RandomMover):
