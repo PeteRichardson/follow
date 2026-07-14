@@ -27,8 +27,3 @@ Everything lives in `follow.py`. The class hierarchy:
 - `Escaper2(RandomMover)` — only flees when within a proximity buffer (default 10 units); otherwise stays still (no random walk either).
 
 The `__main__` block wires up: `prey` (Escaper2 fleeing `hunter`) ← `hunter` (Follower chasing `prey`) + `randy` (RandomMover).
-
-## Known Quirks
-
-- `World.draw` references the global `animals` list instead of `self.animals` (line 46) — a bug in the original code.
-- `Escaper2.move` doesn't call `super().move()` when outside the buffer, so the entity freezes rather than wandering freely when not threatened.
