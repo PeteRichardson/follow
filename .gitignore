@@ -1,3 +1,6 @@
 .venv/
-docs/
+docs/*
+!docs/reviews/
+docs/reviews/*
+!docs/reviews/PROJECT_REVIEW.md
 __pycache__/
